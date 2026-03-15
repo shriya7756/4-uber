@@ -1,0 +1,12 @@
+cat uber_data.csv
+cat uber_data_large.csv
+python3 uber_mapper.py < uber_data.csv
+cat uber_data.csv | python3 uber_mapper.py | sort -k1,1 | python3 uber_reducer.py
+cat uber_data_large.csv | python3 uber_mapper.py | sort -k1,1 | python3 uber_reducer.py
+hadoop fs -put uber_data.csv /rmm_uber_data
+hadoop fs -put uber_data_large.csv /rmm_uber_data
+hadoop fs -ls /rmm_uber_data
+hadoop jar /home/hadoop/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar -file uber_mapper.py -mapper "python3 uber_mapper.py" -file uber_reducer.py -reducer "python3 uber_reducer.py" -input /rmm_uber_data/uber_data.csv -output /rmm_uber_data/uber_output1
+hadoop fs -cat /rmm_uber_data/uber_output1/part-00000
+hadoop jar /home/hadoop/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar -file uber_mapper.py -mapper "python3 uber_mapper.py" -file uber_reducer.py -reducer "python3 uber_reducer.py" -input /rmm_uber_data/uber_data_large.csv -output /rmm_uber_data/uber_output2
+hadoop fs -cat /rmm_uber_data/uber_output2/part-00000
